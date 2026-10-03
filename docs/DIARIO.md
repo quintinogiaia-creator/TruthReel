@@ -89,3 +89,36 @@ Cada entrada apunta al commit donde está el cambio.
   Telegram **una sola vez** si queda bloqueado, si una etapa lleva 3 intentos
   fallando o cuando un vídeo está listo y revisado.
 - **Nombre de trabajo:** TruthReel.
+
+## 2026-10-03 02:00 · Flow sí funcionaba: el que fallaba era el código
+
+- **Qué lo disparó:** Francis: *"Flow no tarda tanto"*.
+- **Dos fallos encadenados en `broll_nube.flow`:**
+  1. Flow contestaba *"por la alta demanda, la tarea está en la cola"* y el
+     código lo trataba como un error y abandonaba. Flow generaba el clip
+     igualmente: había 3 clips hechos sin descargar.
+  2. La cuadrícula de Flow ya no tiene `<video>`, solo miniaturas
+     `flow-content.google/image/<id>`. El vídeo está en `/video/<id>`, pero solo
+     con la URL firmada que carga el reproductor al pasar el ratón.
+- Los 3 clips se rescataron y Universal Modder se montó con ellos.
+
+## 2026-10-03 02:10 · Miniaturas: la misma frase para todo vídeo de IA
+
+- **Qué lo disparó:** *"esa miniatura ya la hemos utilizado"*.
+- **Causa:** el prompt del fondo era una frase fija para cualquier tema de IA y
+  además iba con caché: el mismo teclado morado en todos los vídeos. Su foto
+  salía de solo 5 recortes.
+- **Arreglo:** fondo con un prompt propio del tema y sin caché; huella
+  perceptual (dHash) de toda miniatura, fondo y foto usados; puerta que bloquea
+  lo parecido. La foto de Francis ahora es **nueva en cada vídeo**: InstantID en
+  local (gratis), en dos pasadas (pose sin cara + cara con 3 de sus fotos) y con
+  filtro de parecido facial.
+- **Ganchos honestos:** «CREA JUEGOS CON IA» (falso: modifica, no crea) y
+  «Modifica cualquier juego» (la promesa que el vídeo desmiente) ya no pasan.
+  Sale «¿Modifica cualquier juego?».
+
+## 2026-10-03 02:30 · Publicado
+
+- Repo público: <https://github.com/quintinogiaia-creator/TruthReel>,
+  historial limpio (el privado tenía una clave antigua en un commit), AGPL-3.0.
+- El enlace sale en cada descripción de YouTube y en cada publicación en redes.

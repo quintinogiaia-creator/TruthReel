@@ -206,7 +206,7 @@ def generar(destino: Path, *, video: str, rnd: random.Random | None = None) -> d
         if not mejor or p["parecido"] > mejor["parecido"]:
             mejor = {"cand": cand, "ref": "+".join(r.name for r in elegidas), "prompt": positivo, "parecido": round(p["parecido"], 3),
                      "semilla": semilla}
-        if p["parecido"] >= UMBRAL + 0.1:
+        if p["parecido"] >= UMBRAL + 0.07:
             break  # suficientemente fiel: no gastar más GPU
     if not mejor:
         raise RuntimeError(f"ninguna de {INTENTOS} fotos generadas se parece lo bastante a Francis")
