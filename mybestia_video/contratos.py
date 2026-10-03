@@ -93,6 +93,9 @@ class Render(Contrato):
     mp4: str
     segundos: float = Field(gt=60)
     estilo: str = ""
+    # segundos de la apertura (clip de su cara) antes de la narración: el short
+    # y todo lo que use los tiempos de la voz tienen que sumarlos
+    apertura_s: float = 0.0
 
 
 class Calidad(Contrato):
@@ -111,9 +114,18 @@ class Miniatura(Contrato):
     prompt_fondo: str = ""
 
 
+class Short(Contrato):
+    mp4: str
+    segundos: float = Field(ge=15, le=60)
+    tramos: list[list[float]]
+    texto: str
+
+
 class Publicado(Contrato):
     youtube_url: str
     titulo: str
+    short_url: str = ""
+    avisos: list[str] = []
 
 
 class Revision(Contrato):

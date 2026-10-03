@@ -122,3 +122,20 @@ Cada entrada apunta al commit donde está el cambio.
 - Repo público: <https://github.com/quintinogiaia-creator/TruthReel>,
   historial limpio (el privado tenía una clave antigua en un commit), AGPL-3.0.
 - El enlace sale en cada descripción de YouTube y en cada publicación en redes.
+
+## 2026-10-03 03:40 · Subido el primer vídeo del motor nuevo, y Flow con su cara
+
+- **Publicado:** largo <https://youtu.be/bngFRqZPG9k> y short
+  <https://youtu.be/Vv2r3E8XZ1A>. La etapa `publicar` ya no usa la del pipeline
+  viejo, que regeneraba la miniatura con el sistema antiguo.
+- **Dos fallos encontrados al subir:** la cuota de Maton estaba agotada (ahora
+  va por la subida directa con OAuth propio) y el filtro anti-duplicados tomaba
+  el vídeo por "gemelo" de otro solo por compartir "Claude" y "letra pequeña".
+- **El short pasó por la puerta y lo paró dos veces, con razón:** no nombraba
+  la herramienta y el veredicto duraba 4 s. Ahora la selección exige el nombre
+  (sacado del dossier) y un cierre explicado. Whisper escribía
+  "UniversalModder" junto: la comparación aproximada ya lo tolera.
+- **Clips con la cara de Francis:** su foto nueva (InstantID) entra como
+  ingrediente en Flow. Primer clip en 59 s.
+- **Web:** demo de WhatsApp, enlaces clicables, menú de agencia, portada sin
+  la esfera 3D, responsive comprobado a 5 anchos en 12 páginas.

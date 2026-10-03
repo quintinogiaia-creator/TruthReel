@@ -70,6 +70,9 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("seguir-pendientes", help="(timer) reanuda los proyectos en pausa por fallos pasajeros")
 
+    au = sub.add_parser("automatico", help="(timer) siguiente tema del plan CON dossier: lo crea y lo avanza")
+    au.add_argument("--subir", action="store_true", help="sube si pasa todas las puertas")
+
     e = sub.add_parser("estado", help="qué etapa está hecha en cada proyecto")
     e.add_argument("proyecto", nargs="?")
 
@@ -85,6 +88,22 @@ def main(argv: list[str] | None = None) -> int:
         for nombre, res in seguir_pendientes().items():
             print(f"{nombre}: {res}")
         return 0
+
+    if a.orden == "automatico":
+        from .temas import siguiente_tema
+        from .avisos import avisar
+        tema = siguiente_tema()
+        if not tema:
+            avisar("📭 No hay tema con dossier verificado en la cola: mándame reels nuevos para investigar.")
+            return 0
+        slug = _slug(tema)
+        p = Proyecto.crear(slug)
+        p.escribir("tema.json", Tema(tema=tema, categoria="IA", modo="long",
+                                     pid=f"{slug[:40].strip('-')}-{datetime.now():%m%d%H%M}"))
+        print(f"[mybestia-video] automático: {tema} → {p.carpeta}")
+        res = avanzar(p, subir=a.subir)
+        print(_resumen(p)); print(f"[mybestia-video] resultado: {res}")
+        return 0 if res in ("listo", "publicado") else 1
 
     if a.orden == "nuevo":
         slug = _slug(a.tema)

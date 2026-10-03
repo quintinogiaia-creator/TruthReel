@@ -29,6 +29,11 @@ def run(p: Proyecto) -> str:
     pub = legado.carpeta_om(tema.pid) / "assets/public"
     clips = [pub / v["src"] for k, v in p.leer("fondos.json", Fondos).fondos.items()
              if v.get("type") == "video" and (k.startswith("veo_") or k.startswith("clip_ia"))]
+    from .clips import CLIP_CARA
+    from ..contratos import Kit
+    cara = Path(p.leer("kit.json", Kit).carpeta) / CLIP_CARA
+    if cara.exists():
+        clips.append(cara)
     r.medidas["clips_ia"] = len(clips)
     repetidos = [c.name for c in clips if huellas.ya_usado(c, salvo_video=p.carpeta.name)]
     por_huella = {}

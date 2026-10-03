@@ -58,3 +58,15 @@ def test_huellas_un_clip_no_sale_en_dos_videos(tmp_path, monkeypatch):
     huellas.registrar([clip], "video1")
     assert huellas.ya_usado(copia)                       # mismo contenido, otro nombre
     assert not huellas.ya_usado(copia, salvo_video="video1")  # el propio vídeo no cuenta
+
+
+def test_cobertura_aproximada_tolera_erratas_de_whisper():
+    clave = ["universal", "modder"]
+    oido = rv.normalizar("con universal moder puedes")
+    assert rv.cobertura(clave, oido, min_len=3) == 0.5
+    assert rv.cobertura(clave, oido, min_len=3, aproximada=True) == 1.0
+
+
+def test_cobertura_aproximada_palabras_pegadas():
+    oido = rv.normalizar("UniversalModder genera todo")
+    assert rv.cobertura(["universal", "modder"], oido, min_len=3, aproximada=True) == 1.0

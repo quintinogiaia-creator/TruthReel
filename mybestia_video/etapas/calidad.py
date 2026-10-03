@@ -27,7 +27,8 @@ def run(p: Proyecto) -> str:
         raise Bloqueado("no cumple la receta: " + " | ".join(fallos))
     from presentador_overlay import poner
     final = p.ruta("final.mp4")
-    con_pres = poner(Path(render.mp4), p.ruta("final_con_presentador.mp4"), vertical=tema.modo == "short")
+    con_pres = poner(Path(render.mp4), p.ruta("final_con_presentador.mp4"), vertical=tema.modo == "short",
+                     desde=render.apertura_s)
     if not con_pres:
         raise Bloqueado("falta el presentador (webcam de Francis en recuadro)")
     shutil.copy(con_pres, final)

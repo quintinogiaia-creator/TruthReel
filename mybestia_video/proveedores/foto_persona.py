@@ -148,6 +148,18 @@ def _render(wf: dict, timeout: int = 420) -> bytes | None:
     return None
 
 
+def _menos_usada(opciones: list[str], campo: str, rnd: random.Random) -> str:
+    """La ropa (o pose) que menos ha salido; empate al azar. Sin esto, dos
+    fotos seguidas salieron con la misma camisa azul."""
+    from .. import huellas
+    usos = {o: 0 for o in opciones}
+    for reg in huellas._imagenes().values():
+        if reg.get(campo) in usos:
+            usos[reg[campo]] += 1
+    minimo = min(usos.values())
+    return rnd.choice([o for o, n in usos.items() if n == minimo])
+
+
 def referencias() -> list[Path]:
     """Sus fotos donde la cara se reconoce mejor (puntuadas una vez y guardadas)."""
     try:
@@ -185,7 +197,8 @@ def generar(destino: Path, *, video: str, rnd: random.Random | None = None) -> d
     mejor = None
     for intento in range(INTENTOS):
         elegidas = rnd.sample(refs, min(3, len(refs)))
-        positivo = (f"professional photograph of {RASGOS}, wearing {rnd.choice(ROPA)}, {rnd.choice(POSE)}, "
+        ropa, pose = _menos_usada(ROPA, "ropa", rnd), _menos_usada(POSE, "pose", rnd)
+        positivo = (f"professional photograph of {RASGOS}, wearing {ropa}, {pose}, "
                     "neatly styled hair, well groomed, trustworthy and approachable, medium shot from the waist up, "
                     f"{rnd.choice(FONDO)} studio background, soft studio lighting, 85mm lens, sharp focus, "
                     "photorealistic, natural skin")
@@ -204,12 +217,13 @@ def generar(destino: Path, *, video: str, rnd: random.Random | None = None) -> d
             print("[foto] se parece a una foto ya usada; otra")
             continue
         if not mejor or p["parecido"] > mejor["parecido"]:
-            mejor = {"cand": cand, "ref": "+".join(r.name for r in elegidas), "prompt": positivo, "parecido": round(p["parecido"], 3),
+            mejor = {"cand": cand, "ropa": ropa, "pose": pose, "ref": "+".join(r.name for r in elegidas), "prompt": positivo, "parecido": round(p["parecido"], 3),
                      "semilla": semilla}
         if p["parecido"] >= UMBRAL + 0.07:
             break  # suficientemente fiel: no gastar más GPU
     if not mejor:
         raise RuntimeError(f"ninguna de {INTENTOS} fotos generadas se parece lo bastante a Francis")
     _recortar(mejor["cand"], destino)
-    huellas.registrar_imagen(mejor["cand"], "foto", video, {"ref": mejor["ref"]})
+    huellas.registrar_imagen(mejor["cand"], "foto", video,
+                             {"ref": mejor["ref"], "ropa": mejor["ropa"], "pose": mejor["pose"]})
     return {k: v for k, v in mejor.items() if k != "cand"}

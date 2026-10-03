@@ -99,13 +99,26 @@ def destellos(luma: list[float], salto: float) -> int:
     return n
 
 
-def cobertura(referencia: list[str], oido: list[str], min_len: int = 5) -> float:
-    """Fracción de palabras largas de la referencia que aparecen en lo oído."""
+def cobertura(referencia: list[str], oido: list[str], min_len: int = 5, aproximada: bool = False) -> float:
+    """Fracción de palabras largas de la referencia que aparecen en lo oído.
+    `aproximada`: cuenta también parecidas (Whisper escribe "Moder" por "Modder",
+    "Cloud" por "Claude"), útil para nombres propios."""
     ref = [w for w in referencia if len(w) >= min_len]
     if not ref:
         return 1.0
     oido_set = set(oido)
-    return sum(1 for w in ref if w in oido_set) / len(ref)
+
+    def oida(w: str) -> bool:
+        if w in oido_set:
+            return True
+        if not aproximada:
+            return False
+        # pegada a otra ("UniversalModder" -> "universalmodder")
+        if len(w) >= 5 and any(w in o for o in oido_set if len(o) > len(w)):
+            return True
+        import difflib
+        return bool(difflib.get_close_matches(w, oido_set, n=1, cutoff=0.8))
+    return sum(1 for w in ref if oida(w)) / len(ref)
 
 
 def transcribir(video: Path, modelo: str = "small") -> str:
@@ -186,7 +199,7 @@ def revisar(video: Path, *, guion: str, tema: str, modo: str = "long",
         if r.medidas["voz_cobertura"] < u.voz_cobertura_min:
             r.fallos.append(f"la voz solo dice el {r.medidas['voz_cobertura']:.0%} del guion")
         clave = palabras_clave(tema)
-        r.medidas["tema_cobertura"] = round(cobertura(clave, oido, min_len=3), 3)
+        r.medidas["tema_cobertura"] = round(cobertura(clave, oido, min_len=3, aproximada=True), 3)
         if clave and r.medidas["tema_cobertura"] < u.tema_cobertura_min:
             faltan = [w for w in clave if w not in set(oido)]
             r.fallos.append(f"la voz no habla del tema del título (no se oye: {', '.join(faltan)})")
